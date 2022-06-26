@@ -1,0 +1,12 @@
+#! /bin/sh
+
+case "`uname -s`" in
+	Darwin )
+		bin=bin-macos ;;
+	* )
+		echo "Unsupported system" >&2
+		exit 126 ;;
+esac
+
+dir=~/"works/Commands/visualizer/binaries"
+PATH="$dir:$PATH" exec $bin "$@"

@@ -1,0 +1,14 @@
+[package]
+name = "visualizer"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossterm = "0.23.1"
+image = "0.24.1"
+base64 = "0.13.0"
+clap = { version = "3.1.12", features = ["derive"] }
+itertools = "0.10.3"
+rayon = "1.5.1"
