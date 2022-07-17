@@ -9,6 +9,7 @@ pub struct Status {
 	pub terminal:  TM,
 	pub color:     TC,
 	pub pixels:    TP,
+	pub aa:        u8,
 	pub output:    Option<String>
 }
 
@@ -16,7 +17,8 @@ pub enum InternalDrawMode {
 	Ansi,
 	Color(ColorStatus),
 	Colorbar(ColorbarStatus),
-	Mandelbrot
+	Mandelbrot,
+	NewtonApprox(NewtonApproxStatus)
 }
 pub type DM = InternalDrawMode;
 
@@ -59,6 +61,12 @@ pub struct ColorbarStatus {
 pub enum CBSMode {
 	SMPTE,
 	ARIB
+}
+
+pub struct NewtonApproxStatus {
+	pub p:   usize,
+	pub tau: f64,
+	pub max: usize
 }
 
 pub enum C {

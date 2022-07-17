@@ -28,6 +28,9 @@ pub struct Args {
 	/// ターミナルへのテキスト出力の解像度を選択します。
 	#[clap(long,arg_enum,default_value_t=TerminalPixels::Single)]
 	pub pixels: TerminalPixels,
+	/// アンチエイリアスのレベルを指定します。2以上の整数を指定するとアンチエイリアスが有効になります。ANSIテストとカラーバー以外で有効なオプションです。
+	#[clap(long,default_value_t=2)]
+	pub aa: u8,
 	#[clap(long)]
 	/// visualizer コマンドの使い方を表示します。
 	pub help: bool
@@ -69,6 +72,18 @@ pub enum DrawMode {
 	},
 	/// マンデルブロ集合を描画します。
 	Mandelbrot,
+	/// 1の p 乗根のニュートン近似の収束先を描画します。
+	Newton {
+		#[clap(short,default_value_t = 6)]
+		/// 次数を指定します。
+		p: usize,
+		#[clap(short,long,default_value_t = 0.1)]
+		/// 収束因子 τ を指定します。
+		tau: f64,
+		#[clap(short,long,default_value_t = 1000)]
+		/// 最大イテレート回数を指定します。この回数を超えても収束しない場合は黒色になります。
+		max: usize
+	},
 	/// デジタル放送用ARIBカラーバーを描画します。
 	Arib {
 		#[clap(short,long)]
@@ -149,7 +164,15 @@ pub fn init_status(a:&Args) -> Status {
 			DM::Colorbar(s)
 		},
 		Some(DrawMode::Mandelbrot) => DM::Mandelbrot,
+		Some(DrawMode::Newton {p,tau,max}) => {
+			DM::NewtonApprox(NewtonApproxStatus {p,tau,max})
+		}
 		Some(DrawMode::Help) => { panic!(); }
+	};
+
+	let aa = match &dm {
+		DM::Ansi|DM::Colorbar(_) => 0,
+		_ => a.aa
 	};
 
 	let mut s = Status {
@@ -168,6 +191,7 @@ pub fn init_status(a:&Args) -> Status {
 			TerminalPixels::Single => TP::Single,
 			TerminalPixels::Double => TP::Double
 		},
+		aa: aa,
 		output: a.output.as_ref().map(|s| String::from(s))
 	};
 

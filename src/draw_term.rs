@@ -65,12 +65,14 @@ fn draw_term_impl(mut s:Status) -> Result<()> {
 					if let DM::Color(cs) = &mut s.draw_mode {
 						match e.kind {
 							MouseEventKind::Down(_) => {
-								let coord = unify_coord_stretched(e.column,e.row*2,&s.size);
+								let sp:CF = ( 0.5/(s.size.0 as f64) , 1.0/(s.size.1 as f64) );
+								let coord = unify_coord(e.column, e.row*2, &s.size, &[sp])[0];
 								color_mouse_down(&coord,&s.size,cs);
 							},
 							MouseEventKind::Drag(_)|MouseEventKind::Up(_) => {
 								let st = Time::now();
-								let coord = unify_coord_stretched(e.column,e.row*2,&s.size);
+								let sp:CF = ( 0.5/(s.size.0 as f64) , 1.0/(s.size.1 as f64) );
+								let coord = unify_coord(e.column, e.row*2, &s.size, &[sp])[0];
 								color_mouse_drag(&coord,&s.size,cs);
 								frame(&s)?;
 								let en = Time::now();
@@ -119,59 +121,65 @@ fn frame_texts(s:&Status) -> Result<()> {
 	stdout()
 		.queue(terminal::DisableLineWrap)?;
 
-	let iter_indexes = iproduct!(
-		(0..s.size.1).step_by(2),
-		0..s.size.0
-	).par_bridge();
-	let cells:Vec<_> = iter_indexes.map(move |(y,x)| {
+	let subpixels = aa_subpixels(s.aa, &s.size, match s.pixels {
+		TP::Single => true,
+		TP::Double => false
+	});
 
-		let osc = match s.pixels {
+	let cells:Vec<_> = iproduct!(
+			(0..s.size.1).step_by(2),
+			0..s.size.0
+		).par_bridge()
+		.map(move |(y,x)| {
 
-			TP::Single => {
+			let osc = match s.pixels {
 
-				let coord = unify_coord_stretched(x,y,&s.size);
-				let c = fragment(coord,&s.size,s);
+				TP::Single => {
 
-				match c {
-					C::None    => None,
-					C::Reverse => Some(SPACE.reverse()),
-					_ => {
-						let color = convert_color(c,s);
-						Some(SPACE.on(color))
+					let c = get_color(x,y,&s.size,s,subpixels.as_slice());
+
+					match c {
+						C::None    => None,
+						C::Reverse => Some(SPACE.reverse()),
+						_ => {
+							let color = convert_color(c,s);
+							Some(SPACE.on(color))
+						}
 					}
+
+				},
+
+				TP::Double => {
+
+					let c1 = get_color(x,y  ,&s.size,s,subpixels.as_slice());
+					let c2 = get_color(x,y+1,&s.size,s,subpixels.as_slice());
+
+					match (c1,c2) {
+						(C::None,C::None) => None,
+						(c1,C::None) => {
+							let color = convert_color(c1,s);
+							Some(UPPER.with(color))
+						},
+						(C::None,c2) => {
+							let color = convert_color(c2,s);
+							Some(LOWER.with(color))
+						},
+						(c1,c2) => {
+							let color1 = convert_color(c1,s);
+							let color2 = convert_color(c2,s);
+							Some(LOWER.on(color1).with(color2))
+						}
+					}
+
 				}
 
-			},
+			};
 
-			TP::Double => {
+			(x,y,osc)
 
-				let c1 = fragment(unify_coord(x,y  ,&s.size),&s.size,s);
-				let c2 = fragment(unify_coord(x,y+1,&s.size),&s.size,s);
+		})
+		.collect();
 
-				match (c1,c2) {
-					(C::None,C::None) => None,
-					(c1,C::None) => {
-						let color = convert_color(c1,s);
-						Some(UPPER.with(color))
-					},
-					(C::None,c2) => {
-						let color = convert_color(c2,s);
-						Some(LOWER.with(color))
-					},
-					(c1,c2) => {
-						let color1 = convert_color(c1,s);
-						let color2 = convert_color(c2,s);
-						Some(LOWER.on(color1).with(color2))
-					}
-				}
-
-			}
-
-		};
-
-		(x,y,osc)
-
-	}).collect();
 	for (x,y,osc) in cells.into_iter() {
 		if let Some(sc) = osc {
 			stdout()

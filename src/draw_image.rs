@@ -22,41 +22,39 @@ fn frame(s:&Status,size:&CU) -> RgbaImage {
 		_ => {}
 	}
 
-	let iter = izip!(
-		iproduct!(
-			0..size.1,
-			0..size.0
-		),
-		ib.pixels_mut()
-	).par_bridge();
-	iter.for_each(move |((y,x),p)| {
+	let subpixels = aa_subpixels(s.aa, &s.size, false);
 
-		let coord = unify_coord(x,y,&size);
-		let c = fragment(coord,&size,s);
+	izip!(
+			iproduct!(0..size.1,0..size.0),
+			ib.pixels_mut()
+		).par_bridge()
+		.for_each(move |((y,x),p)| {
 
-		*p = match c {
-			C::None|C::Reverse => Rgba([0,0,0,0]),
-			C::Float{r,g,b,a} => {
-				let (r,g,b,a) = (
-					(r*255.0).round() as u8,
-					(g*255.0).round() as u8,
-					(b*255.0).round() as u8,
-					(a*255.0).round() as u8
-				);
-				Rgba([r,g,b,a])
-			},
-			C::Int{r,g,b,a} => Rgba([r,g,b,a]),
-			C::GFloat{v,a} => {
-				let (v,a) = (
-					(v*255.0).round() as u8,
-					(a*255.0).round() as u8
-				);
-				Rgba([v,v,v,a])
-			},
-			_ => { panic!(); }
-		};
+			let c = get_color(x,y,&size,s,subpixels.as_slice());
 
-	});
+			*p = match c {
+				C::None|C::Reverse => Rgba([0,0,0,0]),
+				C::Float{r,g,b,a} => {
+					let (r,g,b,a) = (
+						(r*255.0).round() as u8,
+						(g*255.0).round() as u8,
+						(b*255.0).round() as u8,
+						(a*255.0).round() as u8
+					);
+					Rgba([r,g,b,a])
+				},
+				C::Int{r,g,b,a} => Rgba([r,g,b,a]),
+				C::GFloat{v,a} => {
+					let (v,a) = (
+						(v*255.0).round() as u8,
+						(a*255.0).round() as u8
+					);
+					Rgba([v,v,v,a])
+				},
+				_ => { panic!(); }
+			};
+
+		});
 
 	ib
 

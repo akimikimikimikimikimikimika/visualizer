@@ -2,4 +2,3 @@ target.nosync
 target
 Cargo.lock
 .DS_Store
-.vscode

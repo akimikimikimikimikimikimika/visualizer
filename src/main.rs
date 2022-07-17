@@ -16,6 +16,7 @@ mod draw_func;
 mod draw_func_color;
 mod draw_func_colorbar;
 mod draw_func_mandelbrot;
+mod draw_func_newton;
 mod draw_func_ansi;
 
 use clap::Parser;

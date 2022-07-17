@@ -19,7 +19,7 @@ pub fn colorbar_fragment(c:&CF,s:&CU,cbs:&ColorbarStatus) -> C {
 
 	match cbs.mode {
 		CBSMode::SMPTE => smpte_fragment(p),
-		CBSMode::ARIB  => arib_fragment(p)
+		CBSMode::ARIB  =>  arib_fragment(p)
 	}
 
 }
