@@ -1,4 +1,4 @@
-pub use crate::lib::*;
+pub use crate::data::*;
 use std::f64::consts::PI;
 
 extern crate num;

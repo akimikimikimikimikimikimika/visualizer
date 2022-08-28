@@ -7,7 +7,8 @@ extern crate itertools;
 extern crate rayon;
 
 #[macro_use]
-mod lib;
+mod library;
+mod data;
 mod args;
 mod draw_term;
 mod draw_image;
@@ -20,9 +21,12 @@ mod draw_func_newton;
 mod draw_func_ansi;
 
 use clap::Parser;
-use crate::args::{Args,init_status};
-use crate::draw_term::draw_term;
-use crate::draw_image::draw_image;
+use crate::{
+	args::init_status,
+	data::Args,
+	draw_term::draw_term,
+	draw_image::draw_image
+};
 
 fn main() {
 	let args = Args::parse();

@@ -1,10 +1,13 @@
-use crate::lib::*;
-use crate::draw_func_color::color_fragment;
-use crate::draw_func_colorbar::colorbar_fragment;
-use crate::draw_func_mandelbrot::mandelbrot_fragment;
-use crate::draw_func_newton::newton_fragment;
-use crate::draw_func_ansi::*;
-pub use rayon::prelude::*;
+use rayon::prelude::*;
+
+use {
+	crate::data::*,
+	crate::draw_func_color::color_fragment,
+	crate::draw_func_colorbar::colorbar_fragment,
+	crate::draw_func_mandelbrot::mandelbrot_fragment,
+	crate::draw_func_newton::newton_fragment,
+	crate::draw_func_ansi::*
+};
 
 pub fn fragment(coord:CF,size:&CU,status:&Status) -> C {
 

@@ -6,10 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-crossterm = "0.24.0"
-image = "0.24.2"
-base64 = "0.13.0"
-clap = { version = "3.2.8", features = ["derive"] }
-num = "0.4.0"
-itertools = "0.10.3"
-rayon = "1.5.3"
+crossterm = "*"
+image = "*"
+base64 = "*"
+clap = { version = "*", features = ["derive"] }
+num = "*"
+itertools = "*"
+rayon = "*"

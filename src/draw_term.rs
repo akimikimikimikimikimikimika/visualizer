@@ -3,6 +3,7 @@ use crossterm::{
 	QueueableCommand,
 	Result
 };
+use rayon::prelude::*;
 use std::io::{stdout,Write};
 
 use crossterm::tty::IsTty;
@@ -11,10 +12,12 @@ use event::{Event,KeyCode,MouseEventKind};
 use std::env::var as getenv;
 use std::time::SystemTime as Time;
 
-use crate::lib::*;
-use crate::draw_func::*;
-use crate::draw_func_color::{color_mouse_down,color_mouse_drag};
-use crate::draw_image::base64_image;
+use crate::{
+	data::*,
+	draw_func::*,
+	draw_func_color::{color_mouse_down,color_mouse_drag},
+	draw_image::base64_image
+};
 
 pub fn draw_term(s:Status) {
 	try_catch!( draw_term_impl(s) );
@@ -126,7 +129,8 @@ fn frame_texts(s:&Status) -> Result<()> {
 		TP::Double => false
 	});
 
-	let cells:Vec<_> = iproduct!(
+	let cells:Vec<_> =
+		iproduct!(
 			(0..s.size.1).step_by(2),
 			0..s.size.0
 		).par_bridge()

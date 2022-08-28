@@ -1,9 +1,12 @@
 use image::{RgbaImage,Rgba,ImageEncoder};
 use image::codecs::png::PngEncoder;
 use base64::encode as encode_base64;
+use rayon::prelude::*;
 
-use crate::lib::*;
-use crate::draw_func::*;
+use crate::{
+	data::*,
+	draw_func::*
+};
 
 pub fn draw_image(s:Status) {
 
