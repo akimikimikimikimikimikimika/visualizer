@@ -75,9 +75,10 @@ mod common {
 		}
 
 		pub struct NewtonApproxStatus {
-			pub p:   usize,
-			pub tau: f64,
-			pub max: usize
+			pub p:     usize,
+			pub tau:   f64,
+			pub max:   usize,
+			pub speed: bool
 		}
 
 	}
@@ -205,7 +206,10 @@ mod external {
 			tau: f64,
 			#[clap(short,long,default_value_t = 1000)]
 			/// 最大イテレート回数を指定します。この回数を超えても収束しない場合は黒色になります。
-			max: usize
+			max: usize,
+			#[clap(short,long)]
+			/// 収束までに要した時間により色分けします。収束までより時間を要した点ほど暗い値になります。
+			speed: bool
 		},
 		/// デジタル放送用ARIBカラーバーを描画します。
 		Arib {

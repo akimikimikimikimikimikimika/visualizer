@@ -52,8 +52,8 @@ pub fn init_status(a:&Args) -> Status {
 			DM::Colorbar(s)
 		},
 		Some(EDM::Mandelbrot) => DM::Mandelbrot,
-		Some(EDM::Newton {p,tau,max}) => {
-			DM::NewtonApprox(NewtonApproxStatus {p,tau,max})
+		Some(EDM::Newton {p,tau,max, speed}) => {
+			DM::NewtonApprox(NewtonApproxStatus {p,tau,max,speed})
 		}
 		Some(EDM::Help) => { panic!(); }
 	};
